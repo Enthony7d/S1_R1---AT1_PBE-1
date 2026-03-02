@@ -1,34 +1,33 @@
-import { categoriaModel } from "../models/categoria.model.js";
+import Categoria from '../models/categoria.model.js';
 
 const categoriaController = {
 
-    criar: async (req, res) => {
+    create: async (req, res) => {
         try {
             const { descricaoCategoria } = req.body;
-            const result = await categoriaModel.criar(descricaoCategoria);
-            res.status(201).json(result);
+
+            const result = await Categoria.create(descricaoCategoria);
+
+            res.status(201).json({
+                message: 'Categoria criada com sucesso',
+                idCategoria: result.insertId
+            });
+
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ message: error.message });
         }
     },
 
-    listar: async (req, res) => {
-        const data = await categoriaModel.listar();
-        res.json(data);
+    list: async (req, res) => {
+        const categorias = await Categoria.findAll();
+        res.json(categorias);
     },
 
-    atualizar: async (req, res) => {
-        const { id } = req.params;
-        const { descricaoCategoria } = req.body;
-        const result = await categoriaModel.atualizar(id, descricaoCategoria);
-        res.json(result);
-    },
-
-    deletar: async (req, res) => {
-        const { id } = req.params;
-        const result = await categoriaModel.deletar(id);
-        res.json(result);
+    delete: async (req, res) => {
+        await Categoria.delete(req.params.id);
+        res.json({ message: 'Categoria removida' });
     }
+
 };
 
 export default categoriaController;

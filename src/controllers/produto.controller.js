@@ -1,73 +1,48 @@
-import { produtoModel } from "../models/produto.model.js";
+import Produto from '../models/produto.model.js';
 
 const produtoController = {
 
-    upload: async (req, res) => {
+    create: async (req, res) => {
         try {
-            if(!req.file){
-                return res.status(400).json({message:'Arquivo não enviado'});
-            }
 
-            res.status(200).json({
-                message: 'Upload realizado com sucesso',
-                file: {
-                    filename: req.file.filename,
-                    size: req.file.size,
-                    mimetype: req.file.mimetype,
-                }
-            })
-
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({
-                message: 'Ocorreu um erro no servidor',
-                errorMessage: error.message
-            });
-        }
-    },
-
-    criar: async (req, res) => {
-        try {
             const { idCategoria, nomeProduto, valorProduto } = req.body;
 
-            const vinculoImagem = req.file ? req.file.filename : null;
+            if (!req.file) {
+                return res.status(400).json({ message: 'Imagem obrigatória' });
+            }
 
-            const result = await produtoModel.criar({
+            const result = await Produto.create({
                 idCategoria,
                 nomeProduto,
                 valorProduto,
-                vinculoImagem
+                vinculoImagem: req.file.filename
             });
 
-            res.status(201).json(result);
+            res.status(201).json({
+                message: 'Produto criado com sucesso',
+                idProduto: result.insertId
+            });
 
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ message: error.message });
         }
     },
 
-    listar: async (req, res) => {
-        const data = await produtoModel.listar();
-        res.json(data);
+    list: async (req, res) => {
+        const produtos = await Produto.findAll();
+        res.json(produtos);
     },
 
-    atualizar: async (req, res) => {
-        const { id } = req.params;
-        const vinculoImagem = req.file ? req.file.filename : null;
-
-        const result = await produtoModel.atualizar(id, {
-            ...req.body,
-            vinculoImagem
-        });
-
-        res.json(result);
+    update: async (req, res) => {
+        await Produto.update(req.params.id, req.body);
+        res.json({ message: 'Produto atualizado' });
     },
 
-    deletar: async (req, res) => {
-        const { id } = req.params;
-        const result = await produtoModel.deletar(id);
-        res.json(result);
+    delete: async (req, res) => {
+        await Produto.delete(req.params.id);
+        res.json({ message: 'Produto removido' });
     }
+
 };
 
 export default produtoController;

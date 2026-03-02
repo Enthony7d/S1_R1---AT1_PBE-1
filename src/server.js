@@ -1,14 +1,18 @@
+import 'dotenv/config';
 import express from 'express';
 import produtoRoutes from './routes/produto.routes.js';
-import categoriaRoutes from './src/routes/categoria.routes.js';
+import categoriaRoutes from './routes/categoria.routes.js';
 
 const app = express();
 
 app.use(express.json());
+app.use('/uploads', express.static('uploads'));
 
-app.use(produtoRoutes);
-app.use(categoriaRoutes);
+app.use('/produtos', produtoRoutes);
+app.use('/categorias', categoriaRoutes);
 
-app.listen(5500, () => {
-    console.log('Servidor rodando em http://localhost:5500');
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
